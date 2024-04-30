@@ -225,7 +225,7 @@ int main() {
             break;
         }
 
-    } while (opcion != 7);
+    } while (opcion != 9);
 
     return 0;
 }
