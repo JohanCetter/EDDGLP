@@ -120,8 +120,8 @@ int preorden2(nodo *aux3) {
 int inorden(nodo *aux3) {
     if (aux3 != NULL) {
         inorden(aux3->izq);
+        cout << aux3->codigo << endl;
         inorden(aux3->der);
-        cout<<aux3 ->codigo <<endl;
     }
     return 0;
 }
@@ -130,8 +130,8 @@ int inorden(nodo *aux3) {
 int inorden2(nodo *aux3) {
     if (aux3 != NULL) {
         inorden2(aux3->izq);
-        inorden2(aux3->der);
         cout<<aux3 ->ano <<endl;
+        inorden2(aux3->der);
     }
     return 0;
 }
@@ -207,7 +207,12 @@ int casouno(nodo* padre) {
 }
 
 int casodos(nodo* padre) {
-    nodo* hijo = (aux->izq != NULL) ? aux->izq : aux->der;
+     nodo* hijo;
+    if (aux->izq != NULL) {
+        hijo = aux->izq;
+    } else {
+         hijo = aux->der;
+    }
     if (padre != NULL) {
         if (padre->izq == aux) {
             padre->izq = hijo;
@@ -304,5 +309,4 @@ int main() {
     } while (opcion != 10);
 
     return 0;
-}
 }
