@@ -79,7 +79,7 @@ int registrar() {
         if (raiz == NULL) {
             raiz = aux;
             aux2 = raiz;
-            free(aux);
+            
         } 
         else {
             aux2 = raiz;
@@ -88,16 +88,16 @@ int registrar() {
         if (raiz2 == NULL){
             raiz2 = aux;
             aux2 = raiz;
-            free(aux);
+            //free(aux);
         }
         else{
         aux2 = raiz2;
             posicionar2();
-        
+        }
     }
     return 0;
 }
-}
+
 int preorden(nodo *aux3) {
     if (aux3 != NULL) {
         cout << "Codigo: " << aux3->codigo << endl;
@@ -154,35 +154,110 @@ int postorden2(nodo *aux3) {
     return 0;
 }
 
-nodo* ubicar(nodo *aux3, int aguja ){
+nodo* ubicar(nodo *aux3, int aguja) {
+    if (aux3 == NULL) {
+        return NULL;
+    }
     if (aux3->codigo == aguja) {
         aux = aux3;
-        return aux3;
-        }
-        else{
-            if (aux3->izq != NULL) {
-                ubicar(aux3->izq, aguja);
-        } 
-         if (aux3->der != NULL) {        
-            ubicar(aux3->der,aguja);
-        
-        }
+        return aux3; 
+    }
+    nodo* Izquierda = NULL;
+    nodo* Derecha = NULL;
+    if (aux3->izq != NULL) {
+        Izquierda = ubicar(aux3->izq, aguja);
+    } 
+    if (aux3->der != NULL) {        
+        Derecha = ubicar(aux3->der, aguja);
+    }
+    
+    if (Izquierda != NULL) {
+        return Izquierda;
+    }    
+    else {
+         return Derecha;
+    }
+
+}
+int ubicarpadre(nodo *padre){
+    if ((padre->izq != NULL)&&(padre->izq!=aux)) {
+        ubicarpadre(padre->izq);
+    }
+    if(padre->izq == aux){
+        aux2 = padre;
+    }
+    if ((padre->der!=NULL)&&(padre->der!=aux)){
+        ubicarpadre(padre->der);
+    }
+     if(padre->der == aux){
+        aux2 = padre;
     }
     return 0;
-    
 }
-int eliminarnodo(){
+int casouno(nodo* padre) {
+    if (padre != NULL) {
+        if (padre->izq == aux) {
+            padre->izq = NULL;
+        } else if (padre->der == aux) {
+            padre->der = NULL;
+        }
+    }
+    free(aux);
+    return 0;
+}
+
+int casodos(nodo* padre) {
+    nodo* hijo = (aux->izq != NULL) ? aux->izq : aux->der;
+    if (padre != NULL) {
+        if (padre->izq == aux) {
+            padre->izq = hijo;
+        } else if (padre->der == aux) {
+            padre->der = hijo;
+        }
+    } else {
+        raiz = hijo;
+    }
+    free(aux);
+    return 0;
+}
+
+int casotres() {
+    nodo* padre = aux;
+    nodo* sucesor = aux->der;
+    while (sucesor->izq != NULL) {
+        padre = sucesor;
+        sucesor = sucesor->izq;
+    }
+    aux->codigo = sucesor->codigo;
+    if (padre == aux) {
+        aux->der = sucesor->der;
+    } else {
+        padre->izq = sucesor->der;
+    }
+    free(sucesor);
+    return 0;
+}
+
+int eliminarnodo() {
     int buscar;
-    cout << "Digite el codigo del estudiante que desea buscar" << endl;
+    cout << "Digite el codigo del estudiante que desea eliminar" << endl;
     cin >> buscar;
     aux = ubicar(raiz, buscar);
-    /*if (aux==NULL);
-        cout<<"el nodo no se encuentra";
-    else 
-          cout<<"nodo encontrado";*/
+    if (aux == NULL) {
+        cout << "El estudiante con el codigo " << buscar << " no se encuentra en el arbol." << endl;
+        return 0;
+    }
+    if (aux->izq == NULL && aux->der == NULL) {
+        casouno(aux2);
+        cout<<"estudiante eliminado"<<endl;
+    } else if (aux->izq != NULL && aux->der != NULL) {
+        casotres();
+        cout<<"estudiante eliminado"<<endl;
+    } else {
+        casodos(aux2);
+        cout<<"estudiante eliminado"<<endl;
+    }
     return 0;
-
-    
 }
 
 int main() {
@@ -202,7 +277,7 @@ int main() {
         cout << "5  Postorden" << endl;
         cout << "6  preorden 2" << endl;
         cout << "7  inorden 2" << endl;
-        cout << "8  post-orden 2" << endl;
+        cout << "8  postorden 2" << endl;
         cout << "9  eliminar" << endl;
         cout << "10 Salir" << endl;
         cin >> opcion;
@@ -217,15 +292,17 @@ int main() {
             case 7: inorden2(raiz2); break;
             case 8: postorden2(raiz2); break;
             case 9: eliminarnodo(); break;
+            case 10:     
                 cout << "Saliendo del programa..." << endl;
                 break;
             default:
             
-            cout << "Opción inválida. Por favor, ingrese una opción válida." << endl;
+            cout << "opcion invalida." << endl;
             break;
         }
 
-    } while (opcion != 9);
+    } while (opcion != 10);
 
     return 0;
+}
 }
