@@ -1,3 +1,6 @@
+// codigo estacionamiento 
+// ANDRES OBREGON MORALES Y JOHAN STEVEN GRUESO 
+
 #include <iostream>
 #include <malloc.h>
 using namespace std;
