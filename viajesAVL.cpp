@@ -123,6 +123,7 @@ int ObtenerBalance(Barcos *ai5) {
 
 Barcos *insertar(Barcos *nodo) {
     if (nodo == NULL) {
+        cout << "Insertando nueva embarcacion: " << aux->nomBarco << " con identificador: " << aux->Identificador << endl;
         return aux;
     }
     if (aux->Identificador < nodo->Identificador) {
@@ -328,7 +329,11 @@ int main() {
                 break;
             
             case 3:
-                inorden(Raiz);
+                if (Raiz != NULL) {
+                    inorden(Raiz);
+                } else {
+                    cout << "No hay embarcaciones registradas." << endl;
+                }
                 cout << endl;
                 break;  
             
