@@ -1,6 +1,6 @@
 #include <iostream>
-#include <malloc.h>
-#include <string> // Para usar std::string y std::to_string
+#include <string>
+#include <cstdlib>
 
 using namespace std;
 
@@ -8,18 +8,18 @@ struct pasajeros {
     char nom[50];
     char apellido[50];
     int DNI;
-    int a;
+    int a; // Matricula del barco
     pasajeros *sig;
 };
 
-pasajeros *cab = NULL, *auxi1 = NULL, *auxi2 = NULL;
+pasajeros *cab = NULL;
 
 struct Barcos {
     char nomBarco[30];
     char Lugar[30];
     int Precio = 0;
     int espacio = 0;
-    char matriculaParcial[3]; // Espacio para dos caracteres y el terminador nulo
+    char matriculaParcial[3]; 
     int Matricula = 0;
     int Dia = 0, Mes = 0, Anio = 0;
     int total = 0;
@@ -32,37 +32,19 @@ struct Barcos {
 Barcos *Raiz = NULL, *aux = NULL;
 
 int buscarBarco;
-char concatenar;
 
 void generarIdentificador(Barcos *barco) {
     string identificador = "";
-
-    // Convertir los dos primeros caracteres de la matrícula a string
-    identificador += barco->matriculaParcial[0];
-    identificador += barco->matriculaParcial[1];
-
-    // Agregar el año
+    identificador += barco->matriculaParcial;
     identificador += to_string(barco->Anio);
-
-    // Agregar el mes (con ceros a la izquierda si es necesario)
-    if (barco->Mes < 10) {
-        identificador += "0";
-    }
-    identificador += to_string(barco->Mes);
-
-    // Agregar el día (con ceros a la izquierda si es necesario)
-    if (barco->Dia < 10) {
-        identificador += "0";
-    }
-    identificador += to_string(barco->Dia);
-
-    // Convertir la cadena completa a un número entero
+    identificador += (barco->Mes < 10 ? "0" : "") + to_string(barco->Mes);
+    identificador += (barco->Dia < 10 ? "0" : "") + to_string(barco->Dia);
     barco->Identificador = stoi(identificador);
 }
 
 int registrar() {
-    int MatriculaParcial = 0;
-    aux = (struct Barcos *)malloc(sizeof(struct Barcos));
+    int MatriculaParcial;
+    aux = (Barcos *)malloc(sizeof(Barcos));
 
     cout << "Ingrese la matricula: ";
     cin >> MatriculaParcial;
@@ -70,11 +52,10 @@ int registrar() {
 
     if (MatriculaParcial < 10) {
         cout << "Intentelo nuevamente con un numero mayor a 10" << endl;
-        free(aux); // Liberar memoria antes de retornar
-        return registrar();
+        free(aux);
+        return 1; 
     }
 
-    // Convertir la matrícula parcial a dos caracteres
     snprintf(aux->matriculaParcial, sizeof(aux->matriculaParcial), "%02d", MatriculaParcial);
 
     cout << "Ingrese el nombre del barco (No dejar espacios en el nombre): ";
@@ -92,13 +73,11 @@ int registrar() {
     cout << "Ingrese el dia en que viaja: ";
     cin >> aux->Dia;
 
-    generarIdentificador(aux); // Generar identificador para el nuevo barco
-
+    generarIdentificador(aux);
     return 0;
 }
 
-// BALANCEO
-int ObtenerAltura(struct Barcos *a) {
+int ObtenerAltura(Barcos *a) {
     if (a == NULL) {
         return 0;
     }
@@ -109,9 +88,9 @@ int mayor(int ai2, int ai3) {
     return (ai2 > ai3) ? ai2 : ai3;
 }
 
-struct Barcos *RotarDerecha(struct Barcos *y) {
-    struct Barcos *x = y->izq;
-    struct Barcos *ai4 = x->der;
+Barcos *RotarDerecha(Barcos *y) {
+    Barcos *x = y->izq;
+    Barcos *ai4 = x->der;
 
     x->der = y;
     y->izq = ai4;
@@ -122,9 +101,9 @@ struct Barcos *RotarDerecha(struct Barcos *y) {
     return x;
 }
 
-struct Barcos *RotarIzquierda(struct Barcos *x) {
-    struct Barcos *y = x->der;
-    struct Barcos *ai4 = y->izq;
+Barcos *RotarIzquierda(Barcos *x) {
+    Barcos *y = x->der;
+    Barcos *ai4 = y->izq;
 
     y->der = x;
     x->izq = ai4;
@@ -135,14 +114,14 @@ struct Barcos *RotarIzquierda(struct Barcos *x) {
     return y;
 }
 
-int ObtenerBalance(struct Barcos *ai5) {
+int ObtenerBalance(Barcos *ai5) {
     if (ai5 == NULL) {
         return 0;
     }
     return ObtenerAltura(ai5->izq) - ObtenerAltura(ai5->der);
 }
 
-struct Barcos *insertar(struct Barcos *nodo) {
+Barcos *insertar(Barcos *nodo) {
     if (nodo == NULL) {
         return aux;
     }
@@ -181,16 +160,16 @@ struct Barcos *insertar(struct Barcos *nodo) {
     return nodo;
 }
 
-int inorden(struct Barcos *c) {
+void inorden(Barcos *c) {
     if (c != NULL) {
         inorden(c->izq);
-        cout << "1. Nombre del barco: " << c->nomBarco << "\n2. Destino del viaje: " << c->Lugar << "\n3. Precio del viaje: " << c->Precio << " $\n4. Matricula: " << c->Matricula << "\n5. Fecha de salida: " << c->Dia << "/" << c->Mes << "/" << c->Anio << "\n6. Capacidad maxima: " << c->espacio << "\n7. Identificador: " << c->Identificador << endl;
+        cout << "1. Nombre del barco: " << c->nomBarco << "\n2. Destino del viaje: " << c->Lugar << "\n3. Precio del viaje: " << c->Precio << " $\n4. Matricula: " << c->Matricula
+             << "\n5. Fecha de salida: " << c->Dia << "/" << c->Mes << "/" << c->Anio << "\n6. Capacidad maxima: " << c->espacio << "\n7. Identificador: " << c->Identificador << endl;
         inorden(c->der);
     }
-    return 0;
 }
 
-Barcos* buscar(struct Barcos *nodo, int matricula) {
+Barcos* buscar(Barcos *nodo, int matricula) {
     if (nodo == NULL || nodo->Matricula == matricula) {
         return nodo;
     }
@@ -200,7 +179,7 @@ Barcos* buscar(struct Barcos *nodo, int matricula) {
     return buscar(nodo->izq, matricula);
 }
 
-int Buscar() {
+void Buscar() {
     Barcos *resultado = buscar(Raiz, buscarBarco);
     if (resultado != NULL) {
         cout << "-------------- Embarcacion registrada --------------" << endl;
@@ -215,80 +194,106 @@ int Buscar() {
     } else {
         cout << "Embarcacion no encontrada" << endl;
     }
-    return 0;
 }
 
-int registrarPasajero() {
-    Barcos *barco = buscar(Raiz, buscarBarco);
-    if (barco == NULL) {
-        cout << "No hay Barcos" << endl;
-        return 0;
-    }
+void registrarPasajero() {
+    pasajeros *nuevoPasajero = (pasajeros *)malloc(sizeof(pasajeros));
 
-    if (cab == NULL) {
-        cab = (struct pasajeros *)malloc(sizeof(struct pasajeros));
-        cout << "Ingrese su nombre: ";
-        cin >> cab->nom;
-        cout << "Ingrese su apellido: ";
-        cin >> cab->apellido;
-        cout << "Ingrese su cedula: ";
-        cin >> cab->DNI;
-        cab->a = barco->Matricula;
+    cout << "Ingrese el nombre del pasajero: ";
+    cin >> nuevoPasajero->nom;
+    cout << "Ingrese el apellido del pasajero: ";
+    cin >> nuevoPasajero->apellido;
+    cout << "Ingrese el DNI del pasajero: ";
+    cin >> nuevoPasajero->DNI;
+    nuevoPasajero->a = buscarBarco;
+    nuevoPasajero->sig = cab;
+    cab = nuevoPasajero;
 
-        if (barco->espacio > barco->total) {
-            barco->total = barco->total + 1;
-        } else {
-            cout << "Ya no hay tickets disponibles" << endl;
-            free(cab); // Liberar memoria antes de retornar
-            return registrarPasajero();
-        }
-
-        cab->sig = NULL;
-        return 0;
-    } else {
-        auxi1 = (struct pasajeros *)malloc(sizeof(struct pasajeros));
-        cout << "Ingrese su nombre: ";
-        cin >> auxi1->nom;
-        cout << "Ingrese su apellido: ";
-        cin >> auxi1->apellido;
-        cout << "Ingrese su cedula: ";
-        cin >> auxi1->DNI;
-        auxi1->a = barco->Matricula;
-
-        if (barco->espacio > barco->total) {
-            barco->total = barco->total + 1;
-        } else {
-            cout << "Ya no hay tickets disponibles" << endl;
-            free(auxi1); // Liberar memoria antes de retornar
-            return registrarPasajero();
-        }
-
-        auxi1->sig = NULL;
-        auxi2 = cab;
-
-        while (auxi2->sig != NULL) {
-            auxi2 = auxi2->sig;
-        }
-
-        auxi2->sig = auxi1;
-    }
-    return 0;
+    cout << "Pasajero registrado exitosamente en el barco con matricula: " << buscarBarco << endl;
 }
 
-int MostrarPasajeros() {
+void MostrarPasajeros() {
     if (cab == NULL) {
         cout << "No hay pasajeros registrados" << endl;
-        return 0;
+        return;
     }
-    auxi1 = cab;
+    pasajeros *auxi1 = cab;
+    bool hayPasajeros = false;
     while (auxi1 != NULL) {
         if (auxi1->a == buscarBarco) {
             cout << "Nombre: " << auxi1->nom << " " << auxi1->apellido << endl;
             cout << "Numero de DNI: " << auxi1->DNI << endl;
+            hayPasajeros = true;
         }
         auxi1 = auxi1->sig;
     }
-    return 0;
+    if (!hayPasajeros) {
+        cout << "No hay pasajeros registrados en el barco con matricula " << buscarBarco << endl;
+    }
+}
+
+Barcos *eliminar(Barcos *raiz, int identificador) {
+    if (raiz == NULL) {
+        return raiz;
+    }
+
+    if (identificador < raiz->Identificador) {
+        raiz->izq = eliminar(raiz->izq, identificador);
+    } else if (identificador > raiz->Identificador) {
+        raiz->der = eliminar(raiz->der, identificador);
+    } else {
+        if (raiz->izq == NULL || raiz->der == NULL) {
+            Barcos *temp = raiz->izq ? raiz->izq : raiz->der;
+
+            if (temp == NULL) {
+                temp = raiz;
+                raiz = NULL;
+            } else { 
+                *raiz = *temp; 
+            }
+            free(temp);
+        } else {
+            Barcos *temp = raiz->der;
+            while (temp->izq != NULL) {
+                temp = temp->izq;
+            }
+            raiz->Identificador = temp->Identificador;
+            raiz->der = eliminar(raiz->der, temp->Identificador);
+        }
+    }
+
+    if (raiz == NULL) {
+        return raiz;
+    }
+
+    raiz->altura = 1 + mayor(ObtenerAltura(raiz->izq), ObtenerAltura(raiz->der));
+
+    int balance = ObtenerBalance(raiz);
+
+    if (balance > 1 && ObtenerBalance(raiz->izq) >= 0) {
+        return RotarDerecha(raiz);
+    }
+    if (balance > 1 && ObtenerBalance(raiz->izq) < 0) {
+        raiz->izq = RotarIzquierda(raiz->izq);
+        return RotarDerecha(raiz);
+    }
+    if (balance < -1 && ObtenerBalance(raiz->der) <= 0) {
+        return RotarIzquierda(raiz);
+    }
+    if (balance < -1 && ObtenerBalance(raiz->der) > 0) {
+        raiz->der = RotarDerecha(raiz->der);
+        return RotarIzquierda(raiz);
+    }
+
+    return raiz;
+}
+
+void eliminarnodo() {
+    int identificador;
+    cout << "Digite el identificador del barco que desea eliminar: ";
+    cin >> identificador;
+    Raiz = eliminar(Raiz, identificador);
+    cout << "Barco eliminado exitosamente" << endl;
 }
 
 int main() {
@@ -311,26 +316,32 @@ int main() {
 
         switch (sel) {
             case 1:
-                registrar();
-                Raiz = insertar(Raiz);
+                if (registrar() == 0) {
+                    Raiz = insertar(Raiz);
+                }
                 break;
+            
             case 2:
                 cout << "Ingrese la matricula del barco a buscar: ";
                 cin >> buscarBarco;
                 Buscar();
                 break;
+            
             case 3:
                 inorden(Raiz);
                 cout << endl;
+                break;  
+            
+            case 4: 
+                eliminarnodo(); 
                 break;
-            case 4:
-                // eliminar
-                break;
+                
             case 5:
                 cout << "Ingrese la matricula del barco donde se va a registrar: ";
                 cin >> buscarBarco;
                 registrarPasajero();
                 break;
+            
             case 6:
                 cout << "Ingrese la matricula del barco para mostrar pasajeros: ";
                 cin >> buscarBarco;
@@ -338,5 +349,6 @@ int main() {
                 break;
         }
     } while (sel != 7);
+
     return 0;
 }
